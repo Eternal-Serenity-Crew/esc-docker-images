@@ -1,0 +1,30 @@
+name: "esc-utilities"
+services:
+  "esc-ports-manager":
+    image: openjdk:21-jdk-slim
+    container_name: "esc-ports-manager"
+    ports:
+      - "${SERVER_PRODUCTION_PORT}:${SERVER_INTERNAL_PORT}"
+    entrypoint: /bin/bash /home/application/startup.sh
+    volumes:
+      - ./docker:/home/
+    env_file:
+      - ./application/.env
+
+  postgres:
+    container_name: "server-ports-manager-postgres"
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - esc-ports-manager-net
+
+networks:
+  esc-ports-manager-net:
+    driver: bridge
